@@ -2,6 +2,16 @@
 
 本项目遵循语义化版本；日期用 `YYYY-MM-DD`。
 
+## 0.2.2 — 2026-11-20
+
+### 文档
+
+- 仓库更名为 **dsh-easy-diary**，README 的安装段重写成自包含的三条路径：本机目录（推荐）、Git 地址、Release 里的 tarball；删掉「把 `plugins/dsh-diary/` 整个目录放进插件搜索路径」——那是插件还寄居在别的仓库里时的旧路径，独立仓库的根目录就是插件本体。
+- 写明包名/插件 id 仍是 `dsh-diary`（`dsh-easy-diary` 只是仓库与展示名）；补充「Git 地址安装时升级会替换整个包目录，`config.json` 会丢」的提醒。
+- `package.json` 的 `repository` / `homepage` / `bugs` 从 `dsh-diary` 改成 `dsh-easy-diary`（旧地址只是 301 重定向）。
+
+无代码改动。
+
 ## 0.2.1 — 2026-11-20
 
 ### 移除

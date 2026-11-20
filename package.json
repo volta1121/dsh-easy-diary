@@ -1,15 +1,15 @@
 {
   "name": "dsh-diary",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Per-session diary for DeepSeek Harness: every night each configured session writes one entry into its own local markdown file.",
   "author": "volta1121",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/volta1121/dsh-diary.git"
+    "url": "git+https://github.com/volta1121/dsh-easy-diary.git"
   },
-  "homepage": "https://github.com/volta1121/dsh-diary",
+  "homepage": "https://github.com/volta1121/dsh-easy-diary",
   "bugs": {
-    "url": "https://github.com/volta1121/dsh-diary/issues"
+    "url": "https://github.com/volta1121/dsh-easy-diary/issues"
   },
   "keywords": [
     "dsh",
