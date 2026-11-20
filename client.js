@@ -24,10 +24,9 @@ window.__ModuleLoader__.load({
         loading: '读取中…',
         refresh: '刷新',
         refreshing: '读取中',
-        legacy: '旧版控制页',
         errRead: '读取失败：{e}',
         running: '正在写日记…',
-        empty: '还没有配置任何会话；到旧版控制页里添加。',
+        empty: '还没有配置任何会话；点「添加会话」加入一个。',
         on: '已启用',
         off: '已停用',
         done: '今天已写',
@@ -88,10 +87,9 @@ window.__ModuleLoader__.load({
         loading: 'Loading…',
         refresh: 'Refresh',
         refreshing: 'Loading',
-        legacy: 'Classic page',
         errRead: 'Failed to load: {e}',
         running: 'Writing…',
-        empty: 'No sessions configured yet — add one on the classic page.',
+        empty: 'No sessions configured yet — use “Add session”.',
         on: 'Enabled',
         off: 'Disabled',
         done: 'Written today',
@@ -497,10 +495,12 @@ window.__ModuleLoader__.load({
       }, [data && data.at]);
 
       const saveAt = async () => {
-        if (!/^\d{1,2}:\d{2}$/.test(atDraft)) return;
+        // 和后端一致地把「25:00 / 22:70」这种挡在前面，而不是发过去等后端忽略
+        const m = /^(\d{1,2}):(\d{2})$/.exec(atDraft.trim());
+        if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) return;
         setAtBusy(true);
         try {
-          await post('/config', { at: atDraft });
+          await post('/config', { at: atDraft.trim() });
           load();
         } catch {
           /* 下一轮刷新会显示真实状态 */
@@ -573,8 +573,7 @@ window.__ModuleLoader__.load({
             ),
             h('span', { className: 'dd-hint' }, data ? text(data.diaryDir) : t('loading')),
             h('button', { className: 'dd-btn', onClick: toggleAdd, disabled: !data || state.status === 'loading' }, adding ? t('close') : t('add')),
-            h('button', { className: 'dd-btn', onClick: load, disabled: state.status === 'loading' }, state.status === 'loading' ? t('refreshing') : t('refresh')),
-            h('a', { className: 'dd-link', href: text((data && data.legacyUrl) || '/diary-api/ui'), target: '_blank', rel: 'noreferrer' }, t('legacy')),
+            h('button', { className: 'dd-btn', onClick: load, disabled: !data || state.status === 'loading' }, state.status === 'loading' ? t('refreshing') : t('refresh')),
           ),
         ),
         state.error ? h('p', { className: 'dd-error' }, t('errRead', { e: state.error })) : null,
@@ -648,7 +647,6 @@ window.__ModuleLoader__.load({
 .dd-btn{cursor:pointer;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--dsw-alias-border-default,rgba(255,255,255,.16));background:transparent;color:inherit}
 .dd-btn:disabled{opacity:.5;cursor:default}
 .dd-btn.danger{border-color:var(--dsw-alias-state-error,#ff6b6b);color:var(--dsw-alias-state-error,#ff6b6b)}
-.dd-link{font-size:12px;color:var(--dsw-alias-state-business-primary,#7aa2ff);text-decoration:none}
 .dd-card{border:1px solid var(--dsw-alias-border-default,rgba(255,255,255,.12));border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--dsw-alias-bg-elevated,rgba(255,255,255,.02))}
 .dd-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dd-title{font-size:14px;font-weight:600}

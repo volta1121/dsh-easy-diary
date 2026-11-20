@@ -1,15 +1,15 @@
 {
   "name": "dsh-diary",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Per-session diary for DeepSeek Harness: every night each configured session writes one entry into its own local markdown file.",
-  "author": "Derpyu520",
+  "author": "volta1121",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Derpyu520/dsh-diary.git"
+    "url": "git+https://github.com/volta1121/dsh-diary.git"
   },
-  "homepage": "https://github.com/Derpyu520/dsh-diary",
+  "homepage": "https://github.com/volta1121/dsh-diary",
   "bugs": {
-    "url": "https://github.com/Derpyu520/dsh-diary/issues"
+    "url": "https://github.com/volta1121/dsh-diary/issues"
   },
   "keywords": [
     "dsh",
@@ -31,6 +31,7 @@
     "client.js",
     "cordis.patch.yml",
     "README.md",
+    "CHANGELOG.md",
     "config.example.json",
     "LICENSE"
   ],
