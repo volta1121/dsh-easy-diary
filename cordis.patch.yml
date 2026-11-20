@@ -2,5 +2,5 @@
 # 插件本身没有任何设置命名空间（不导出 Config），所以这里 config 留空对象即可。
 - insert:
     - id: dsh-diary
-      name: dsh-diary
+      name: dsh-easy-diary
       config: {}

@@ -36,25 +36,30 @@ AI对话优先调用日记
 
 ## 安装
 
-这个仓库的**根目录就是插件本体**（没有 `plugins/dsh-diary/` 这一层，那是最早寄居在别的仓库里时留下的旧路径）。装法三选一：
+这个仓库的**根目录就是插件本体**（没有 `plugins/dsh-diary/` 这一层，那是最早寄居在别的仓库里时留下的旧路径）。
 
-### 方式一：本机目录（推荐）
+### 最简单：从 npm 装
+
+1. DSH → 左侧「插件」→「添加插件」。
+2. 在「包名或地址」里填 **`dsh-easy-diary`**，点「安装」。
+3. 在插件列表里确认它是启用状态，然后去 **设置 → 日记**。
+
+发布页：<https://www.npmjs.com/package/dsh-easy-diary>。
+
+> 配置 `config.json` 写在插件自己的目录里。npm 装的那份位于 profile 的 `node_modules` 下，**卸载 / 升级会连同包目录一起被替换**——升级前把 `config.json` 复制出来，装完再放回去；不想操这个心就用下面的本地目录装法。
+
+### 本地目录（改代码，或不想走 npm）
 
 1. 把仓库放到一个固定位置，例如 `C:\Users\<你>\.dsh\plugins\dsh-easy-diary`——`git clone https://github.com/volta1121/dsh-easy-diary`，或在 GitHub 上下 ZIP 解压。
-2. 打开 DSH → 左侧「插件」→「添加插件」，把上面那个**目录的完整路径**填进「包名或地址」，点「安装」。
-3. 在插件列表里确认 `dsh-diary` 是启用状态（必要时点一下开关），然后去 **设置 → 日记**。
+2. 「插件」→「添加插件」，把上面那个**目录的完整路径**填进「包名或地址」，点「安装」。
 
-配置会写在这个目录的 `config.json` 里，升级时替换目录不会丢。
+配置也在同一个目录里，升级时替换目录不会丢。
 
-### 方式二：直接填 Git 地址
+### 用 Release 里的包
 
-「插件」→「添加插件」→ 填 `https://github.com/volta1121/dsh-easy-diary` →「安装」。DSH 会把它装进 profile 的 `node_modules`；**升级时整个包目录会被替换，`config.json` 会一起没掉**，所以这条路子建议装完先把 `config.json` 复制出去备份，或者干脆走方式一。
+从 [Releases](https://github.com/volta1121/dsh-easy-diary/releases) 下 `dsh-diary-*.tgz`，解压出 `package/`，再按「本地目录」那步装。
 
-### 方式三：用 Release 里的包
-
-从 [Releases](https://github.com/volta1121/dsh-easy-diary/releases) 下 `dsh-diary-*.tgz`，解压出一个 `package/` 目录，再按方式一第 2 步用本地目录安装。
-
-> 包名（npm 名 / 插件 id）仍然是 `dsh-diary`，配置文件和日志里用的也是它；`dsh-easy-diary` 只是仓库和展示名。
+> 发布名是 `dsh-easy-diary`；插件内部 id、日志文件名（`dsh-diary.log`）、`/diary-api` 路由都没变——原本想用的 npm 名 `dsh-diary` 已被别人先占了。
 
 装好后设置页挂在 DSH 自己的 web 服务上（同源、不占端口），入口是 **设置 → 日记**；状态自检直接 `GET <DSH 地址>/diary-api/state`。
 
@@ -64,7 +69,7 @@ AI对话优先调用日记
 # cordis.patch.yml
 - insert:
     - id: dsh-diary
-      name: dsh-diary
+      name: dsh-easy-diary
       config: {}
 ```
 
