@@ -1,0 +1,12 @@
+# 运行时数据
+config.json
+state.json
+*.log
+
+# 备份与临时脚本
+*.bak
+*.bak-*
+_tmp_*.cjs
+
+# 依赖
+node_modules/
