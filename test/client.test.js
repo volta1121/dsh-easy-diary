@@ -2,6 +2,7 @@
 // 拦下 __ModuleLoader__，喂一个最小 React 桩，然后调用 apply()。
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 const registrations = [];
 let entry = null;
@@ -31,9 +32,10 @@ const requireStub = (name) => {
 
 await import('../client.js');
 
-test('client.js 通过 __ModuleLoader__ 自注册且 id 正确', () => {
+test('client.js 通过 __ModuleLoader__ 自注册且 id 与包名一致', () => {
   assert.ok(entry, '没有调用 __ModuleLoader__.load');
-  assert.equal(entry.id, 'dsh-diary');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.equal(entry.id, pkg.name);
   assert.equal(typeof entry.factory, 'function');
 });
 

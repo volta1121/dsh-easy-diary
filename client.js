@@ -10,7 +10,10 @@
  * 双语：跟随 DSH 的 locale 服务，导航标题用 thunk 注册，切语言自动重取。
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-diary',
+  // 必须是包名（DSH 按插件名找已注册的 factory；写成别的 id 会让宿主
+  // 以为这个 bundle「loaded without registering」，从而再执行一次并报
+  // duplicate factory registration）。
+  id: 'dsh-easy-diary',
   factory(require) {
     const React = require('react');
     const h = React.createElement;

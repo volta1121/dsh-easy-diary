@@ -2,6 +2,13 @@
 
 本项目遵循语义化版本；日期用 `YYYY-MM-DD`。
 
+## 0.2.3 — 2026-11-21（本地构建，尚未发布）
+
+### 修复
+
+- **客户端模块 id 与包名不一致，设置里「日记」整页消失**：改名后 `client.js` 注册的 id 仍是 `dsh-diary`，而 DSH 按插件名 `dsh-easy-diary` 查找已注册的 factory，找不到就再执行一遍 bundle，于是报 `client-modules: duplicate factory registration for "dsh-diary"` 并让整个客户端半边加载失败。现在 id 与 `package.json` 的 `name` 一致。
+- `test/client.test.js` 的自注册用例改为断言「id 等于 `package.json` 的 `name`」，以后改名再踩同一个坑会直接测试失败。
+
 ## 0.2.2 — 2026-11-20
 
 ### 变更
