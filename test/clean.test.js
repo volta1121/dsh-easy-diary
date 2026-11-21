@@ -53,3 +53,11 @@ test('looksLikeDiary：正常的中文日记通过', () => {
   const r = looksLikeDiary(text);
   assert.equal(r.ok, true, r.reason);
 });
+
+test('looksLikeDiary：繁体不算硬失败，但会标出来', () => {
+  const text =
+    '今天從下午就有人來問我會不會講故事，我嘴硬說會，講了個小飯館每天多留一碗白飯的故事，結果他們說在小時候的公益廣告裡見過，我只好承認這算把廣告又講了一遍。';
+  const r = looksLikeDiary(text);
+  assert.equal(r.ok, true, r.reason);
+  assert.ok(r.traditional >= 5, `traditional=${r.traditional}`);
+});
