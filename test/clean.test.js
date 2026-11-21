@@ -22,6 +22,19 @@ test('cleanText：清掉乱码替换符', () => {
   assert.equal(cleanText('今天天气不错\uFFFD，出去走了一圈。'), '今天天气不错，出去走了一圈。');
 });
 
+test('cleanText：前面引过空的 <diary></diary>，不能吞掉后面的正文', () => {
+  const raw =
+    'Only <diary></diary> content. Simple Chinese prose.\n\n<diary>今天早上起得晚，煮了两个鸡蛋，边吃边看窗外的风把树叶吹得直响，下午把桌子收拾了一遍。</diary>';
+  const out = cleanText(raw);
+  assert.ok(out.startsWith('今天早上起得晚'), `实际输出：${out}`);
+  assert.ok(!out.includes('Simple Chinese'), `实际输出：${out}`);
+});
+
+test('cleanText：多段 <diary> 取最长的一段', () => {
+  const raw = '<diary>好</diary>\n<diary>今天跑了三公里，回来洗了澡，晚上读了几页书，睡得很早。</diary>';
+  assert.equal(cleanText(raw), '今天跑了三公里，回来洗了澡，晚上读了几页书，睡得很早。');
+});
+
 test('looksLikeDiary：中文太少直接拒', () => {
   const r = looksLikeDiary('嗯，好的。');
   assert.equal(r.ok, false);

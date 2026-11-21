@@ -1,6 +1,6 @@
 {
   "name": "dsh-easy-diary",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Per-session diary for DeepSeek Harness: every night each configured session writes one entry into its own local markdown file.",
   "author": "volta1121",
   "repository": {
