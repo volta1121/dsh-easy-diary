@@ -8,6 +8,7 @@
 
 - **客户端模块 id 与包名不一致，设置里「日记」整页消失**：改名后 `client.js` 注册的 id 仍是 `dsh-diary`，而 DSH 按插件名 `dsh-easy-diary` 查找已注册的 factory，找不到就再执行一遍 bundle，于是报 `client-modules: duplicate factory registration for "dsh-diary"` 并让整个客户端半边加载失败。现在 id 与 `package.json` 的 `name` 一致。
 - `test/client.test.js` 的自注册用例改为断言「id 等于 `package.json` 的 `name`」，以后改名再踩同一个坑会直接测试失败。
+- **新增/重新启用会话不再立刻写日记**：原先 `POST /config` 在这两种情况下会马上 `runDue()`，于是在设置页点「加入」的瞬间，插件就往那个会话里丢一条写日记任务（实测在 QQ 群会话里注入 3 条消息、对话被打断，日记还因正文不合格失败重试）。现在任何配置改动都只重排定时器，从下一次 `at` 开始写；要补今天用卡片上的「现在写今天」，加入后设置页也会提示这一点。
 
 ## 0.2.2 — 2026-11-20
 

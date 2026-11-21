@@ -76,6 +76,7 @@ window.__ModuleLoader__.load({
         addJoin: '加入',
         addNone: '没有匹配的会话',
         addDone: '已加入',
+        addHint: '已加入。它从下一次 {at} 开始自动写；想现在就补今天的，点它卡片上的「现在写今天」。',
         addLoading: '加载会话列表…',
         close: '收起',
         saved: '已保存',
@@ -139,6 +140,7 @@ window.__ModuleLoader__.load({
         addJoin: 'Add',
         addNone: 'No matching sessions',
         addDone: 'Added',
+        addHint: 'Added. It starts with the next {at} run — use “Write today” on its card to catch up now.',
         addLoading: 'Loading sessions…',
         close: 'Close',
         saved: 'Saved',
@@ -472,6 +474,7 @@ window.__ModuleLoader__.load({
       const [cands, setCands] = useState(null);
       const [q, setQ] = useState('');
       const [joinBusy, setJoinBusy] = useState('');
+      const [notice, setNotice] = useState('');
 
       const load = () => {
         setState((prev) => ({ ...prev, status: prev.data ? 'refreshing' : 'loading' }));
@@ -532,6 +535,7 @@ window.__ModuleLoader__.load({
         setJoinBusy(it.id);
         try {
           await post('/config', { add: [{ id: it.id, label: it.title || it.id, bookId: it.id, cwd: it.cwd || '' }] });
+          setNotice(t('addHint', { at: text(state.data && state.data.at) || '22:00' }));
           load();
         } catch {
           /* 失败时按钮恢复，用户可再点 */
@@ -580,6 +584,7 @@ window.__ModuleLoader__.load({
           ),
         ),
         state.error ? h('p', { className: 'dd-error' }, t('errRead', { e: state.error })) : null,
+        notice ? h('p', { className: 'dd-hint' }, notice) : null,
         adding
           ? h(
               'div',
