@@ -18,7 +18,7 @@ AI对话优先调用日记
 1. 到 `at` 指定的时间（默认 22:00），插件对每个「写日记」开着的会话依次处理。
 2. 往该会话投一条提示词（固定前缀 + 正文模板，见 [提示词](#提示词)）。如果她正在聊，先打断这一回合，写完再接上。
 3. 等她自己写：以会话日志的 `turn/end` 为准，这一回合结束才收正文（最多等 `maxWaitMs`，默认 150 秒；到点还没收尾就停掉回合，宁可不写也不收半篇）。
-4. `cleanText()` 清掉标签外的东西，`looksLikeDiary()` 复核——中文太少、像压缩记录、像条目列表的直接判不合格。
+4. `cleanText()` 清掉标签外的东西，`looksLikeDiary()` 复核——中文太少、像压缩记录、像条目列表的直接判不合格；整篇写成繁体的，会要她用简体重写一遍。
 5. 把正文追加到 `diaryDir` 下这本书的 `.md`，一节 `## YYYY-MM-DD 日记`。
 6. 如果这条会话勾了「写完清上下文」，再执行一次「归档注入新对话」；如果第 2 步打断了她正在聊的天，写完接回去。
 
@@ -57,7 +57,7 @@ AI对话优先调用日记
 
 ### 用 Release 里的包
 
-从 [Releases](https://github.com/volta1121/dsh-easy-diary/releases) 下 `dsh-diary-*.tgz`，解压出 `package/`，再按「本地目录」那步装。
+从 [Releases](https://github.com/volta1121/dsh-easy-diary/releases) 下 `dsh-easy-diary-*.tgz`，解压出 `package/`，再按「本地目录」那步装。
 
 > 发布名是 `dsh-easy-diary`；插件内部 id、日志文件名（`dsh-diary.log`）、`/diary-api` 路由都没变——原本想用的 npm 名 `dsh-diary` 已被别人先占了。
 
@@ -182,13 +182,13 @@ DSH 里打开 **设置 → 日记**（`client.js` 注册 `settings.section`，�
 
 ## 测试
 
-纯逻辑部分有单元测试（`test/clean.test.js`、`test/bridge.test.js`、`test/at.test.js`、`test/client.test.js`，共 16 个用例），用 Node 内置测试跑：
+纯逻辑部分有单元测试（`test/` 下五个文件，共 20 个用例），用 Node 内置测试跑：
 
 ```bash
 node --test
 ```
 
-覆盖：`cleanText` 取 `<diary>` 正文、剥开头说明行、清乱码；`looksLikeDiary` 拒「中文太少」、拒压缩摘要、拒条目列表，以及正常中文日记通过；桥映射三种形状的归一化与非法值丢弃；从会话标签猜 `group:` / `private:` key；`normalizeAt` 接受 `7:05` 并拒绝 `25:00` / `22:70`。
+覆盖：`cleanText` 取 `<diary>` 正文、剥开头说明行、清乱码；`looksLikeDiary` 拒「中文太少」、拒压缩摘要、拒条目列表，以及正常中文日记通过；桥映射三种形状的归一化与非法值丢弃；从会话标签猜 `group:` / `private:` key；`normalizeAt` 接受 `7:05` 并拒绝 `25:00` / `22:70`；`validDay` 挡住 `2026-02-31` 这种假日期；`client.js` 注册的 id 必须等于包名。
 
 ## 已知限制
 
