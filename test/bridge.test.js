@@ -1,43 +1,55 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+
 import { __test } from '../lib/index.js';
 
-const { normalizeBridgeMap, guessKeyFromLabel } = __test;
-const A = 'session-aaaaaaaa-1111-2222-3333-444444444444';
-const B = 'session-bbbbbbbb-1111-2222-3333-444444444444';
+const { remapStructure } = __test;
+const OLD = 'session-old-1111';
+const NEW = 'session-new-2222';
 
-test('normalizeBridgeMap：QQ 桥的 sessions.json 形状（带 sessionPolicies 也不干扰）', () => {
-  const out = normalizeBridgeMap({
-    sessions: { 'group:1034279878': A, 'private:1879047761': B },
-    sessionPolicies: { 'group:1034279878': ['reserved2', 'qq-chat-v2', null] },
+test('桥映射：{sessions: {key: id}} 只改命中的那一项', () => {
+  const map = { sessions: { 'group:1': OLD, 'group:2': 'session-keep' }, sessionPolicies: { 'group:1': ['reserved2'] } };
+  assert.equal(remapStructure(map, OLD, NEW, 'group:1'), true);
+  assert.deepEqual(map.sessions, { 'group:1': NEW, 'group:2': 'session-keep' });
+  assert.deepEqual(map.sessionPolicies, { 'group:1': ['reserved2'] });
+});
+
+test('桥映射：{sessions: {key: {sessionId}}} 认 sessionId / session_id / id 三种字段', () => {
+  const map = {
+    sessions: {
+      a: { sessionId: OLD },
+      b: { session_id: OLD },
+      c: { id: OLD },
+      d: { sessionId: 'session-keep' },
+    },
+  };
+  assert.equal(remapStructure(map, OLD, NEW, ''), true);
+  assert.deepEqual(map.sessions, {
+    a: { sessionId: NEW },
+    b: { session_id: NEW },
+    c: { id: NEW },
+    d: { sessionId: 'session-keep' },
   });
-  assert.deepEqual(out, { 'group:1034279878': A, 'private:1879047761': B });
 });
 
-test('normalizeBridgeMap：GET /api/sessions 的数组形状', () => {
-  const out = normalizeBridgeMap({
-    sessions: [
-      { key: 'group:1034279878', sessionId: A, owner: false },
-      { key: 'private:1879047761', sessionId: B, owner: true },
-    ],
-  });
-  assert.deepEqual(out, { 'group:1034279878': A, 'private:1879047761': B });
+test('桥映射：{sessions: [{key, sessionId}]} 数组形状', () => {
+  const map = { sessions: [{ key: 'group:1', sessionId: OLD }, { key: 'group:2', sessionId: 'session-keep' }] };
+  assert.equal(remapStructure(map, OLD, NEW, ''), true);
+  assert.equal(map.sessions[0].sessionId, NEW);
+  assert.equal(map.sessions[1].sessionId, 'session-keep');
 });
 
-test('normalizeBridgeMap：扁平形状', () => {
-  assert.deepEqual(normalizeBridgeMap({ 'group:1': A }), { 'group:1': A });
+test('桥映射：扁平形状按这本日记自己的 key 兜底', () => {
+  const map = { 'group:1': OLD, 'group:2': 'session-keep' };
+  assert.equal(remapStructure(map, OLD, NEW, 'group:1'), true);
+  assert.equal(map['group:1'], NEW);
+  assert.equal(map['group:2'], 'session-keep');
 });
 
-test('normalizeBridgeMap：非法值（不是 session- 开头 / 缺 key）被丢掉，不抛错', () => {
-  assert.deepEqual(normalizeBridgeMap({ 'group:1': 'not-a-session', '': A, 'group:2': null }), {});
-  assert.deepEqual(normalizeBridgeMap(null), {});
-  assert.deepEqual(normalizeBridgeMap('乱码'), {});
-});
-
-test('guessKeyFromLabel：从会话标签猜聊天 key', () => {
-  assert.equal(guessKeyFromLabel('1034279878 群'), 'group:1034279878');
-  assert.equal(guessKeyFromLabel('1879047761 私聊'), 'private:1879047761');
-  assert.equal(guessKeyFromLabel('qq 群聊'), '');
-  assert.equal(guessKeyFromLabel('好友 私聊'), '');
-  assert.equal(guessKeyFromLabel(''), '');
+test('桥映射：没命中就不算改过，也不碰别处出现的同一个 id', () => {
+  const map = { sessions: { 'group:1': 'session-keep' }, history: [OLD], note: { old: OLD } };
+  assert.equal(remapStructure(map, OLD, NEW, 'group:9'), false);
+  assert.equal(map.sessions['group:1'], 'session-keep');
+  assert.deepEqual(map.history, [OLD]);
+  assert.deepEqual(map.note, { old: OLD });
 });
