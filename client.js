@@ -53,6 +53,7 @@ window.__ModuleLoader__.load({
         search: '可查旧日记',
         recapPre: '新对话注入',
         recapPost: '篇',
+        recapOff: '这台 DSH 没有静默注入接口，这一项不会生效',
         everyPre: '每',
         everyPost: '天归档',
         atPre: '每天',
@@ -117,6 +118,7 @@ window.__ModuleLoader__.load({
         search: 'Search old entries',
         recapPre: 'Inject into new sessions',
         recapPost: 'entries',
+        recapOff: 'This DSH has no silent inject API, so this setting has no effect',
         everyPre: 'Every',
         everyPost: 'days, archive',
         atPre: 'Daily at',
@@ -226,7 +228,7 @@ window.__ModuleLoader__.load({
     }
 
     function Card(props) {
-      const { s, today, onWrite, onArchive, onPatch, onDone } = props;
+      const { s, today, recapOk, onWrite, onArchive, onPatch, onDone } = props;
       const l = useLang();
       const t = translator(l);
       const [busy, setBusy] = useState('');
@@ -436,6 +438,7 @@ window.__ModuleLoader__.load({
               style: { width: 56, margin: '0 6px' },
             }),
             h('span', null, t('recapPost')),
+            recapOk === false ? h('span', { className: 'dd-hint dd-warn' }, t('recapOff')) : null,
           ),
           h(
             'label',
@@ -621,7 +624,7 @@ window.__ModuleLoader__.load({
         data && data.running ? h('p', { className: 'dd-hint' }, t('running')) : null,
         sessions.length === 0
           ? h('p', { className: 'dd-empty' }, data ? t('empty') : '…')
-          : sessions.map((s) => h(Card, { key: text(s.id) || text(s.label), s, today, onDone: load })),
+          : sessions.map((s) => h(Card, { key: text(s.id) || text(s.label), s, today, recapOk: data && data.recapOk, onDone: load })),
       );
     }
 
@@ -652,6 +655,7 @@ window.__ModuleLoader__.load({
 .dd-h2{margin:0;font-size:16px;font-weight:600;color:var(--dsw-alias-text-primary,#e8e8ea)}
 .dd-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .dd-hint{margin:0;font-size:12px;color:var(--dsw-alias-text-tertiary,#9a9aa2)}
+.dd-warn{color:var(--dsw-alias-text-warning,#e0a23a)}
 .dd-btn{cursor:pointer;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--dsw-alias-border-default,rgba(255,255,255,.16));background:transparent;color:inherit}
 .dd-btn:disabled{opacity:.5;cursor:default}
 .dd-btn.danger{border-color:var(--dsw-alias-state-error,#ff6b6b);color:var(--dsw-alias-state-error,#ff6b6b)}
