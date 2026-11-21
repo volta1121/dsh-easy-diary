@@ -110,7 +110,7 @@ DSH 里打开 **设置 → 日记**（`client.js` 注册 `settings.section`，�
 | `port` | `0` | 独立端口（同一套 JSON 接口）；`0` = 不开，走 DSH web 路由 `/diary-api` |
 | `token` | `""` | 控制口令牌，空则首次启动自动生成并写回 `config.json` |
 | `catchUp` | `true` | 启动时补写「上次打开 DSH 那天」漏掉的日记 |
-| `recapDays` | `3` | 注入记忆默认天数（会话可覆盖） |
+| `recapDays` | `3` | 新对话注入最近几篇日记（会话可覆盖；按篇数算，不是日历天） |
 | `prompt` | `""` | 全局正文模板，空 = 内置 `DEFAULT_PROMPT` |
 | `retryMs` | `300000` | 失败后隔多久重试 |
 | `holdFile` | `""` | 可选：写日记时给 QQ 桥的占位文件 |
@@ -129,7 +129,7 @@ DSH 里打开 **设置 → 日记**（`client.js` 注册 `settings.section`，�
 | `label` | 显示名 |
 | `enabled` | 是否写，默认 `true` |
 | `reset` | 写完是否归档换新（清上下文），默认 `false` |
-| `recapDays` | 注入几天记忆 |
+| `recapDays` | 新对话注入几篇日记（篇数） |
 | `search` | 新对话是否带「可查旧日记」规则，默认 `true` |
 | `prompt` | 这条会话的正文模板（旧字段） |
 | `promptFull` | 这条会话的**完整**提示词（含前缀），非空时原样使用 |
