@@ -241,21 +241,27 @@ window.__ModuleLoader__.load({
       const [reading, setReading] = useState(false);
       const [editing, setEditing] = useState(false);
       const [draft, setDraft] = useState('');
+      const [numDraft, setNumDraft] = useState({});
 
       const last = s.last && typeof s.last === 'object' ? s.last : null;
       const doneToday = s.todayWritten === true;
       const enabled = s.enabled !== false;
 
-      const run = async (kind, fn) => {
-        setBusy(kind);
-        setMsg(null);
+      const run = async (kind, fn, opts) => {
+        // quiet：改选项这类高频、无副作用的小动作不进入 busy 态。
+        // 一 busy 就会把整张卡片的输入框都 disabled，光标被弹走、页面闪一下。
+        const quiet = !!(opts && opts.quiet);
+        if (!quiet) {
+          setBusy(kind);
+          setMsg(null);
+        }
         try {
           const r = await fn();
-          if (r) setMsg(r);
+          if (r && !quiet) setMsg(r);
         } catch (e) {
           setMsg({ ok: false, text: String((e && e.message) || e) });
         } finally {
-          setBusy('');
+          if (!quiet) setBusy('');
         }
       };
 
@@ -297,11 +303,32 @@ window.__ModuleLoader__.load({
       };
 
       const patch = (diff) =>
-        run('patch', async () => {
-          await post('/config', { sessions: [{ id: s.id, ...diff }] });
-          onDone();
-          return { ok: true, text: t('saved') };
-        });
+        run(
+          'patch',
+          async () => {
+            await post('/config', { sessions: [{ id: s.id, ...diff }] });
+            onDone();
+            return { ok: true, text: t('saved') };
+          },
+          { quiet: true },
+        );
+
+      // 数字框先记在本地，失焦/回车才发出去：每敲一个字就 POST 一次，
+      // 回来还要整页重渲染，看起来就是「输入一下就闪一下」。
+      const numValue = (key, fallback) => {
+        const d = numDraft[key];
+        return d === undefined ? text(fallback) : d;
+      };
+      const commitNum = (key, diff, min, max, fallback) => {
+        const raw = numDraft[key];
+        if (raw === undefined) return;
+        let n = Number(raw);
+        if (!Number.isFinite(n)) n = Number(fallback);
+        n = Math.max(min, Math.min(max, Math.round(n)));
+        // 先把显示改成夹紧后的值，服务端也按同样的上下限存，回读时不会来回跳
+        setNumDraft((prev) => ({ ...prev, [key]: String(n) }));
+        patch({ [key]: n, ...diff });
+      };
 
       // 看日记：/read 回的是 file 头 + 全文，text/plain，不是 JSON
       const toggleView = async () => {
@@ -431,10 +458,14 @@ window.__ModuleLoader__.load({
               className: 'dd-num',
               type: 'number',
               min: 0,
-              max: 30,
-              value: text(s.recapDays == null ? 3 : s.recapDays),
+              max: 365,
+              value: numValue('recapDays', s.recapDays == null ? 3 : s.recapDays),
               disabled: !!busy,
-              onChange: (e) => patch({ recapDays: Number(e.target.value) }),
+              onChange: (e) => setNumDraft((prev) => ({ ...prev, recapDays: e.target.value })),
+              onBlur: () => commitNum('recapDays', {}, 0, 365, 3),
+              onKeyDown: (e) => {
+                if (e.key === 'Enter') e.target.blur();
+              },
               style: { width: 56, margin: '0 6px' },
             }),
             h('span', null, t('recapPost')),
@@ -455,9 +486,13 @@ window.__ModuleLoader__.load({
               type: 'number',
               min: 1,
               max: 365,
-              value: text(s.resetEveryDays || 3),
+              value: numValue('resetEveryDays', s.resetEveryDays || 3),
               disabled: !!busy || s.resetEvery !== true,
-              onChange: (e) => patch({ resetEveryDays: Number(e.target.value), resetEvery: true }),
+              onChange: (e) => setNumDraft((prev) => ({ ...prev, resetEveryDays: e.target.value })),
+              onBlur: () => commitNum('resetEveryDays', { resetEvery: true }, 1, 365, 3),
+              onKeyDown: (e) => {
+                if (e.key === 'Enter') e.target.blur();
+              },
               style: { width: 56, margin: '0 6px' },
             }),
             h('span', null, t('everyPost')),
