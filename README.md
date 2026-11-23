@@ -2,7 +2,7 @@
 
 极简日记，减少AI幻觉，记忆错乱与人格偏移风险
 
-<img width="590" height="451" alt="屏幕截图 2026-11-20 140125" src="https://github.com/user-attachments/assets/463ea048-34cf-495b-8e6b-5ce4bdbf7e9e" />
+<img width="581" height="601" alt="设置页：每本日记一张卡片" src="https://raw.githubusercontent.com/volta1121/dsh-easy-diary/main/docs/settings.png" />
 
 每晚定时让指定会话（可多选）写一篇日记
 可补写指定天数
@@ -36,7 +36,7 @@ AI对话优先调用日记
 
 ## 安装
 
-这个仓库的**根目录就是插件本体**（没有 `plugins/dsh-diary/` 这一层，那是最早寄居在别的仓库里时留下的旧路径）。
+这个仓库的**根目录就是插件本体**。
 
 ### 最简单：从 npm 装
 
