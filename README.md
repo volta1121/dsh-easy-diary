@@ -89,6 +89,17 @@ DSH 里打开 **设置 → 日记**（`client.js` 注册 `settings.section`，�
 
 改任何设置都立即写进 `config.json`（热重载生效，不用重启），并立刻按新时间重排定时器；但**不会**因此马上写日记，新增会话、从关到开也一样——它们从下一次 `at` 开始算。要当场补今天（或补某天），用卡片上的「现在写今天」/「补写这天」。
 
+## 会话里查日记（工具）
+
+插件还给会话注册了两个只读工具，直接读本地 markdown，不经过 QQ 桥、不经过 HTTP：
+
+- **`diary_search`**：按日期（`2026-11-22`）或关键词找片段，返回最近的几篇；
+- **`diary_read`**：给日期读那一天，不给就读最近几篇。
+
+归属只按**调用方自己的 session id** 反查（`id`/`bookId`/`prevIds`）——参数里没有 sessionId，没法指它去读别人的书；查不到对应日记时就退化为全库搜索，并在结果里标明来自哪一本。
+
+工具是否可用取决于会话用的 preset：DSH 默认 `standard` 直接可用；带工具白名单的 preset（例如桥的 `qq-chat-v2`）需要把 `diary_search`/`diary_read` 加进白名单才允许执行。改完后重启 DSH 才加载新工具。
+
 ## 安全边界（重要）
 
 - **只读接口 `/diary-api/*` 不校验身份**：DSH 的 resource 路由不把 Peer 传下来（宿主源码原话：the request becomes a Fetch Request **without a Peer**），只把 `Host` 头交下来，socket 地址在宿主门口就丢了。所以 `/diary-api/state`、`/diary-api/sessions`、`/diary-api/read` 对任何能连上 DSH 端口的进程都可读（含会话 id 与日记全文）。
